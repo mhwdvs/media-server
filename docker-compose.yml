@@ -1,0 +1,95 @@
+services:
+  # compose file documentation: https://docs.docker.com/compose/compose-file/
+
+  jellyfin:
+    image: linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      #- JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
+    volumes:
+      - ${STORAGE_PATH}/config/jellyfin:/config
+      - ${STORAGE_PATH}/tv:/data/tvshows
+      - ${STORAGE_PATH}/movies:/data/movies
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+      - 1900:1900/udp #optional
+    restart: unless-stopped
+
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      #- RUN_OPTS=<run options here> #optional
+    volumes:
+      - ${STORAGE_PATH}/config/jackett:/config
+      - ${STORAGE_PATH}/downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${STORAGE_PATH}/config/sonarr:/config
+      - ${STORAGE_PATH}/tv:/tv #optional
+      - ${STORAGE_PATH}/downloads:/downloads #optional
+    ports:
+      - 8989:8989
+    links:
+      - jackett
+      - qbittorrent
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${STORAGE_PATH}/config/radarr:/config
+      - ${STORAGE_PATH}/movies:/movies #optional
+      - ${STORAGE_PATH}/downloads:/downloads #optional
+    ports:
+      - 7878:7878
+    links:
+      - jackett
+      - qbittorrent
+    restart: unless-stopped
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${STORAGE_PATH}/config/qbittorrent:/config
+      - ${STORAGE_PATH}/downloads:/downloads
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  # watchtower documentation: https://containrrr.dev/watchtower/
+  watchtower: # keeps specified container images up to date
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
