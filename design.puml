@@ -1,0 +1,50 @@
+@startuml Media Server High-Level Architecture Overview
+title Media Server High-Level Architecture Overview
+
+package Docker{
+    [Jellyfish]
+    [Jackett]
+    [Sonarr]
+    [Radarr]
+    [Qbittorrent]
+    [Requestrr]
+    () Gluetun
+}
+
+Jackett <..> Sonarr
+Jackett <..> Radarr
+
+Sonarr <..> Qbittorrent
+Radarr <..> Qbittorrent
+
+Requestrr <..> Sonarr
+Requestrr <..> Radarr
+
+Jackett <--> Gluetun
+Sonarr <--> Gluetun
+Radarr <--> Gluetun
+Qbittorrent <--> Gluetun
+Requestrr <--> Gluetun
+
+note top of Requestrr
+    doesn't have to be in Gluetun,
+    but simplifies Docker networking
+end note
+
+Jellyfish <--> LAN
+Gluetun <--> LAN
+
+note left of Gluetun
+    All services networked via Gluetun can access each other,
+    and are exposed on the local network. All of these services 
+    are also tunneled through the configured VPN service
+end note
+
+LAN <..> Tailscale
+LAN <--> Internet
+
+note right of Tailscale
+    Optional, saves port-forwarding or cloud hosting
+end note
+
+@enduml

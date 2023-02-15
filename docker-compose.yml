@@ -14,10 +14,10 @@ services:
       - ${STORAGE_PATH}/tv:/data/tvshows
       - ${STORAGE_PATH}/movies:/data/movies
     ports:
-      - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - ${JELLYFIN_PORT}:8096
+      #- 8920:8920 #optional
+      #- 7359:7359/udp #optional
+      #- 1900:1900/udp #optional
     restart: unless-stopped
 
   jackett:
@@ -31,8 +31,7 @@ services:
     volumes:
       - ${STORAGE_PATH}/config/jackett:/config
       - ${STORAGE_PATH}/downloads:/downloads
-    ports:
-      - 9117:9117
+    network_mode: "service:gluetun"
     restart: unless-stopped
 
   sonarr:
@@ -46,11 +45,7 @@ services:
       - ${STORAGE_PATH}/config/sonarr:/config
       - ${STORAGE_PATH}/tv:/tv #optional
       - ${STORAGE_PATH}/downloads:/downloads #optional
-    ports:
-      - 8989:8989
-    links:
-      - jackett
-      - qbittorrent
+    network_mode: "service:gluetun"
     restart: unless-stopped
 
   radarr:
@@ -64,11 +59,7 @@ services:
       - ${STORAGE_PATH}/config/radarr:/config
       - ${STORAGE_PATH}/movies:/movies #optional
       - ${STORAGE_PATH}/downloads:/downloads #optional
-    ports:
-      - 7878:7878
-    links:
-      - jackett
-      - qbittorrent
+    network_mode: "service:gluetun"
     restart: unless-stopped
 
   qbittorrent:
@@ -78,18 +69,56 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=${QBITTORRENT_PORT}
     volumes:
       - ${STORAGE_PATH}/config/qbittorrent:/config
       - ${STORAGE_PATH}/downloads:/downloads
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
+    network_mode: "service:gluetun"
     restart: unless-stopped
 
+  requestrr:
+    image: darkalfx/requestrr
+    container_name: requestrr
+    volumes:
+      - ${STORAGE_PATH}/config/requestrr:/root/config
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      # services available via localhost
+      - ${JACKETT_PORT}:9117
+      - ${SONARR_PORT}:8989
+      - ${RADARR_PORT}:7878
+      - ${QBITTORRENT_PORT}:6881
+      - ${QBITTORRENT_PORT}:6881/udp
+      - ${REQUESTRR_PORT}:4545
+    volumes:
+      - ${STORAGE_PATH}/config/gluetun:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=openvpn
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      # OpenVPN:
+      - OPENVPN_USER=${OPENVPN_USER}
+      #- OPENVPN_PASSWORD=
+      # Wireguard:
+      # - WIREGUARD_PRIVATE_KEY=wOEI9rqqbDwnN8/Bpp22sVz48T71vJ4fYmFWujulwUU=
+      # - WIREGUARD_ADDRESSES=10.64.222.21/32
+      # Timezone for accurate log times
+      - TZ=${TZ}
+
   # watchtower documentation: https://containrrr.dev/watchtower/
-  watchtower: # keeps specified container images up to date
+  watchtower: # keeps container images up to date
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
