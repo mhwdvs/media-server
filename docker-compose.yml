@@ -76,6 +76,20 @@ services:
     network_mode: "service:gluetun"
     restart: unless-stopped
 
+  bazarr:
+      image: linuxserver/bazarr:latest
+      container_name: bazarr
+      environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=${TZ}
+      volumes:
+        - ${STORAGE_PATH}/config/bazarr:/config
+        - ${STORAGE_PATH}/movies:/movies #optional
+        - ${STORAGE_PATH}/tv:/tv #optional
+      network_mode: "service:gluetun"
+      restart: unless-stopped
+
   requestrr:
     image: darkalfx/requestrr
     container_name: requestrr
@@ -101,6 +115,7 @@ services:
       - ${RADARR_PORT}:7878
       - ${QBITTORRENT_PORT}:6881
       - ${QBITTORRENT_PORT}:6881/udp
+      - ${BAZARR_PORT}:6767
       - ${REQUESTRR_PORT}:4545
     volumes:
       - ${STORAGE_PATH}/config/gluetun:/gluetun
