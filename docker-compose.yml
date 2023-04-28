@@ -12,8 +12,7 @@ services:
       #- JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
     volumes:
       - ${STORAGE_PATH}/config/jellyfin:/config
-      - ${STORAGE_PATH}/tv:/data/tvshows
-      - ${STORAGE_PATH}/movies:/data/movies
+      - ${STORAGE_PATH}:/data
     ports:
       - ${JELLYFIN_PORT}:8096
       #- 8920:8920 #optional
@@ -51,8 +50,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${STORAGE_PATH}/config/sonarr:/config
-      - ${STORAGE_PATH}/tv:/tv #optional
-      - ${STORAGE_PATH}/downloads:/downloads #optional
+      - ${STORAGE_PATH}:/data
     network_mode: "service:gluetun"
     restart: unless-stopped
 
@@ -65,8 +63,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${STORAGE_PATH}/config/radarr:/config
-      - ${STORAGE_PATH}/movies:/movies #optional
-      - ${STORAGE_PATH}/downloads:/downloads #optional
+      - ${STORAGE_PATH}:/data
     network_mode: "service:gluetun"
     restart: unless-stopped
 
@@ -93,8 +90,7 @@ services:
         - TZ=${TZ}
       volumes:
         - ${STORAGE_PATH}/config/bazarr:/config
-        - ${STORAGE_PATH}/movies:/movies #optional
-        - ${STORAGE_PATH}/tv:/tv #optional
+        - ${STORAGE_PATH}:/data
       network_mode: "service:gluetun"
       restart: unless-stopped
 

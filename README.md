@@ -47,5 +47,4 @@ If you don't intend to store data on your system's main storage device (ie. your
 - have to manually add /downloads folder to sonarr/radarr media management screens
 - have to manually disable anonymous usage statistic logging in sonarr/radarr 
 - have to set preferred protocol in sonarr/radarr to torrent only
-- Currently symlinks are not working from `/downloads` to `/movies` or `/tv`
 - Have to manually configure Qbittorrent to seed
