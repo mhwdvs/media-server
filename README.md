@@ -48,3 +48,12 @@ If you don't intend to store data on your system's main storage device (ie. your
 - have to manually disable anonymous usage statistic logging in sonarr/radarr 
 - have to set preferred protocol in sonarr/radarr to torrent only
 - Have to manually configure Qbittorrent to seed
+
+## Disclaimer
+
+This project is only intended for the download and management of;
+- Shows with open licenses or expired copyrights (eg. Big Buck Bunny)
+- Content you already own on physical media
+    - Maybe you don't have a Blu-Ray player?
+
+I do not recommend or endorse illegitimate usage of any of the services arranged with this docker configuration. Don't use this configuration for anything that may be considered illegal in your place of residence. Observe that all liability and warrenty is waived via the GNU General Public License v3.0.
