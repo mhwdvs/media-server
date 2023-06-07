@@ -125,14 +125,15 @@ services:
       - ${STORAGE_PATH}/config/gluetun:/gluetun
     environment:
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
-      - VPN_TYPE=openvpn
       - SERVER_COUNTRIES=${SERVER_COUNTRIES}
       # OpenVPN:
-      - OPENVPN_USER=${OPENVPN_USER}
+      #- VPN_TYPE=openvpn
+      #- OPENVPN_USER=${OPENVPN_USER}
       #- OPENVPN_PASSWORD=
       # Wireguard:
-      # - WIREGUARD_PRIVATE_KEY=wOEI9rqqbDwnN8/Bpp22sVz48T71vJ4fYmFWujulwUU=
-      # - WIREGUARD_ADDRESSES=10.64.222.21/32
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
       # Timezone for accurate log times
       - TZ=${TZ}
 
