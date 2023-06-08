@@ -102,6 +102,18 @@ services:
     network_mode: "service:gluetun"
     restart: unless-stopped
 
+  jellyseerr:
+       image: fallenbagel/jellyseerr:latest
+       container_name: jellyseerr
+       environment:
+            - LOG_LEVEL=debug
+            - TZ=${TZ}
+       ports:
+            - ${JELLYSEERR_PORT}:5055
+       volumes:
+            - ${STORAGE_PATH}/config/jellyseerr:/app/config
+       restart: unless-stopped
+
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
