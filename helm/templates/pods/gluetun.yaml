@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-gluetun
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: "gluetun"
+          image: "qmcgaw/gluetun:latest"
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: "{{ .Values.gluetun.vpn_service_provider }}"
+            - name: OPENVPN_USER
+              value: "{{ .Values.gluetun.openvpn_user }}"
+            - name: SERVER_COUNTRIES
+              value: "{{ .Values.gluetun.server_countries }}"
+            - name: VPN_TYPE
+              value: "{{ .Values.gluetun.vpn_type }}"
+            - name: HTTPPROXY
+              value: "on"
+            - name: HTTPPROXY_STEALTH
+              value: "on"
+            - name: SHADOWSOCKS
+              value: "off"
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: {{ .Values.gluetun.http_proxy_port }}
+            - name: shadowsocks-tcp
+              protocol: TCP
+              containerPort: {{ .Values.gluetun.shadowsocks_proxy_port }}
+            - name: shadowsocks-udp
+              protocol: UDP
+              containerPort: {{ .Values.gluetun.shadowsocks_proxy_port }}
+          securityContext:                          
+            privileged: true                        
+            capabilities:                           
+              add:                                  
+                - NET_ADMIN              

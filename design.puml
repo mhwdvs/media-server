@@ -3,6 +3,7 @@ title Media Server High-Level Architecture Overview
 
 package Docker{
     [Jellyfish]
+    [Jellyseerr]
     [Jackett]
     [Sonarr]
     [Radarr]
@@ -31,6 +32,11 @@ note top of Requestrr
     but simplifies Docker networking
 end note
 
+Jellyseerr <..> Jellyfish
+Jellyseerr <..> Sonarr
+Jellyseerr <..> Radarr
+
+Jellyseerr <--> LAN
 Jellyfish <--> LAN
 Gluetun <--> LAN
 

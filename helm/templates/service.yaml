@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}-service
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Values.name }}
+  ports:
+    - name: "bazarr"
+      protocol: TCP
+      port:  {{ .Values.bazarr.port }}
+      targetPort: {{ .Values.bazarr.port }}
+      nodePort: {{ .Values.bazarr.port }}
+    - name: "jackett"
+      protocol: TCP
+      port:  {{ .Values.jackett.port }}
+      targetPort: {{ .Values.jackett.port }}
+      nodePort: {{ .Values.jackett.port }}
+    - name: "jellyfin"
+      protocol: TCP
+      port: {{ .Values.jellyfin.port }}
+      targetPort: {{ .Values.jellyfin.port }}
+      nodePort: {{ .Values.jellyfin.port }}
+    - name: "qbittorrent"
+      protocol: TCP
+      port: {{ .Values.qbittorrent.port }}
+      targetPort: {{ .Values.qbittorrent.port }}
+      nodePort: {{ .Values.qbittorrent.port }}
+    - name: "radarr"
+      protocol: TCP
+      port: {{ .Values.radarr.port }}
+      targetPort: {{ .Values.radarr.port }}
+      nodePort: {{ .Values.radarr.port }}
+    - name: "requestrr"
+      protocol: TCP
+      port: {{ .Values.requestrr.port }}
+      targetPort: {{ .Values.requestrr.port }}
+      nodePort: {{ .Values.requestrr.port }}
+    - name: "sonarr"
+      protocol: TCP
+      port: {{ .Values.sonarr.port }}
+      targetPort: {{ .Values.sonarr.port }}
+      nodePort: {{ .Values.sonarr.port }}

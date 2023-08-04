@@ -49,6 +49,10 @@ If you don't intend to store data on your system's main storage device (ie. your
 - have to set preferred protocol in sonarr/radarr to torrent only
 - Have to manually configure Qbittorrent to seed
 
+## Further reading
+
+- Kubernetes networking: https://cloud.redhat.com/blog/guide-to-kubernetes-egress-network-policies
+
 ## Disclaimer
 
 This project is only intended for the download and management of;

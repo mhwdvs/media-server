@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-sonarr
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: "sonarr"
+          image: "linuxserver/sonarr:latest"
+          env:
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.pgid }}"
+            - name: TZ
+              value: "{{ .Values.timezone }}"
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: {{ .Values.sonarr.port }}

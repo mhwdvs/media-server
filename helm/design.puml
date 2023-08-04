@@ -1,0 +1,57 @@
+@startuml Media Server Network Architecture 
+title Media Server Network Architecture 
+
+() Internet
+() VPN
+
+package LAN{
+    () Client
+
+    package "Kubernetes Pods"{
+        [Jellyfin]
+        [Jellyseerr]
+        [Jackett]
+        [Sonarr]
+        [Radarr]
+        [Qbittorrent]
+        [Requestrr]
+        () Gluetun
+    }
+
+    ' Egress for some sensitive services over VPN
+    Gluetun --> VPN
+    VPN --> Internet
+    Qbittorrent --> Gluetun
+    Jackett --> Gluetun
+
+    ' Egress for other services 
+    Jellyfin --> Internet
+    Jellyseerr --> Internet
+    Sonarr --> Internet
+    Radarr --> Internet
+    Requestrr --> Internet
+
+    Sonarr --> Jackett
+    Radarr --> Jackett
+    Sonarr --> Qbittorrent
+    Radarr --> Qbittorrent
+
+    Requestrr --> Sonarr
+    Requestrr --> Radarr
+
+    Jellyseerr --> Jellyfin
+    Jellyseerr --> Sonarr
+    Jellyseerr --> Radarr
+
+    ' Ingress to all services locally
+    Client -->  Jellyfin
+    Client --> Jellyseerr
+    Client --> Jackett
+    Client --> Sonarr
+    Client --> Radarr
+    Client --> Qbittorrent
+    Client --> Requestrr
+}
+
+
+@enduml
