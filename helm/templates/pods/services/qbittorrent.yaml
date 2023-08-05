@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+        service: "qbittorrent"
     spec:
       containers:
         - name: "qbittorrent"
@@ -27,4 +28,4 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              containerPort: {{ .Values.qbittorrent.port }}
+              containerPort: {{ .Values.service.qbittorrent.port }}

@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+        service: "sonarr"
     spec:
       containers:
         - name: "sonarr"
@@ -27,4 +28,4 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              containerPort: {{ .Values.sonarr.port }}
+              containerPort: {{ .Values.service.sonarr.port }}

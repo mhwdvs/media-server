@@ -13,19 +13,20 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+        service: gluetun
     spec:
       containers:
         - name: "gluetun"
           image: "qmcgaw/gluetun:latest"
           env:
             - name: VPN_SERVICE_PROVIDER
-              value: "{{ .Values.gluetun.vpn_service_provider }}"
+              value: "{{ .Values.service.gluetun.vpn_service_provider }}"
             - name: OPENVPN_USER
-              value: "{{ .Values.gluetun.openvpn_user }}"
+              value: "{{ .Values.service.gluetun.openvpn_user }}"
             - name: SERVER_COUNTRIES
-              value: "{{ .Values.gluetun.server_countries }}"
+              value: "{{ .Values.service.gluetun.server_countries }}"
             - name: VPN_TYPE
-              value: "{{ .Values.gluetun.vpn_type }}"
+              value: "{{ .Values.service.gluetun.vpn_type }}"
             - name: HTTPPROXY
               value: "on"
             - name: HTTPPROXY_STEALTH
@@ -35,13 +36,13 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              containerPort: {{ .Values.gluetun.http_proxy_port }}
+              containerPort: {{ .Values.service.gluetun.http_proxy_port }}
             - name: shadowsocks-tcp
               protocol: TCP
-              containerPort: {{ .Values.gluetun.shadowsocks_proxy_port }}
+              containerPort: {{ .Values.service.gluetun.shadowsocks_proxy_port }}
             - name: shadowsocks-udp
               protocol: UDP
-              containerPort: {{ .Values.gluetun.shadowsocks_proxy_port }}
+              containerPort: {{ .Values.service.gluetun.shadowsocks_proxy_port }}
           securityContext:                          
             privileged: true                        
             capabilities:                           

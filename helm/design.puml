@@ -3,9 +3,10 @@ title Media Server Network Architecture
 
 () Internet
 () VPN
+() Client
+() "Tailscale - client"
 
 package LAN{
-    () Client
 
     package "Kubernetes Pods"{
         [Jellyfin]
@@ -16,6 +17,7 @@ package LAN{
         [Qbittorrent]
         [Requestrr]
         () Gluetun
+        () "Tailscale - server"
     }
 
     ' Egress for some sensitive services over VPN
@@ -25,11 +27,11 @@ package LAN{
     Jackett --> Gluetun
 
     ' Egress for other services 
-    Jellyfin --> Internet
-    Jellyseerr --> Internet
-    Sonarr --> Internet
-    Radarr --> Internet
-    Requestrr --> Internet
+    Jellyfin --> Gluetun
+    Jellyseerr --> Gluetun
+    Sonarr --> Gluetun
+    Radarr --> Gluetun
+    Requestrr --> Gluetun
 
     Sonarr --> Jackett
     Radarr --> Jackett
@@ -44,13 +46,15 @@ package LAN{
     Jellyseerr --> Radarr
 
     ' Ingress to all services locally
-    Client -->  Jellyfin
-    Client --> Jellyseerr
-    Client --> Jackett
-    Client --> Sonarr
-    Client --> Radarr
-    Client --> Qbittorrent
-    Client --> Requestrr
+    Client --> "Tailscale - client"
+    "Tailscale - client" --> "Tailscale - server"
+    "Tailscale - server" --> Jellyfin
+    "Tailscale - server" --> Jellyseerr
+    "Tailscale - server" --> Jackett
+    "Tailscale - server" --> Sonarr
+    "Tailscale - server" --> Radarr
+    "Tailscale - server" --> Qbittorrent
+    "Tailscale - server" --> Requestrr
 }
 
 

@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+        service: "jackett"
     spec:
       containers:
         - name: "jackett"
@@ -27,4 +28,4 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              containerPort: {{ .Values.jackett.port }}
+              containerPort: {{ .Values.service.jackett.port }}

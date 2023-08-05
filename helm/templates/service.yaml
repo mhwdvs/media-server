@@ -9,36 +9,36 @@ spec:
   ports:
     - name: "bazarr"
       protocol: TCP
-      port:  {{ .Values.bazarr.port }}
-      targetPort: {{ .Values.bazarr.port }}
-      nodePort: {{ .Values.bazarr.port }}
+      port:  {{ .Values.service.bazarr.port }}
+      targetPort: {{ .Values.service.bazarr.port }}
+      nodePort: {{ .Values.service.bazarr.port }}
     - name: "jackett"
       protocol: TCP
-      port:  {{ .Values.jackett.port }}
-      targetPort: {{ .Values.jackett.port }}
-      nodePort: {{ .Values.jackett.port }}
+      port:  {{ .Values.service.jackett.port }}
+      targetPort: {{ .Values.service.jackett.port }}
+      nodePort: {{ .Values.service.jackett.port }}
     - name: "jellyfin"
       protocol: TCP
-      port: {{ .Values.jellyfin.port }}
-      targetPort: {{ .Values.jellyfin.port }}
-      nodePort: {{ .Values.jellyfin.port }}
+      port: {{ .Values.service.jellyfin.port }}
+      targetPort: {{ .Values.service.jellyfin.port }}
+      nodePort: {{ .Values.service.jellyfin.port }}
     - name: "qbittorrent"
       protocol: TCP
-      port: {{ .Values.qbittorrent.port }}
-      targetPort: {{ .Values.qbittorrent.port }}
-      nodePort: {{ .Values.qbittorrent.port }}
+      port: {{ .Values.service.qbittorrent.port }}
+      targetPort: {{ .Values.service.qbittorrent.port }}
+      nodePort: {{ .Values.service.qbittorrent.port }}
     - name: "radarr"
       protocol: TCP
-      port: {{ .Values.radarr.port }}
-      targetPort: {{ .Values.radarr.port }}
-      nodePort: {{ .Values.radarr.port }}
+      port: {{ .Values.service.radarr.port }}
+      targetPort: {{ .Values.service.radarr.port }}
+      nodePort: {{ .Values.service.radarr.port }}
     - name: "requestrr"
       protocol: TCP
-      port: {{ .Values.requestrr.port }}
-      targetPort: {{ .Values.requestrr.port }}
-      nodePort: {{ .Values.requestrr.port }}
+      port: {{ .Values.service.requestrr.port }}
+      targetPort: {{ .Values.service.requestrr.port }}
+      nodePort: {{ .Values.service.requestrr.port }}
     - name: "sonarr"
       protocol: TCP
-      port: {{ .Values.sonarr.port }}
-      targetPort: {{ .Values.sonarr.port }}
-      nodePort: {{ .Values.sonarr.port }}
+      port: {{ .Values.service.sonarr.port }}
+      targetPort: {{ .Values.service.sonarr.port }}
+      nodePort: {{ .Values.service.sonarr.port }}

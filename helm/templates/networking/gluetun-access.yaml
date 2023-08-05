@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-egress
+spec:
+  podSelector:
+    matchLabels:
+      service: bazarr
+      service: jackett
+      service: jellyfin
+      service: qbittorrent
+      service: radarr
+      service: requestrr
+      service: sonarr
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              service: gluetun
+  policyTypes:
+  - Egress
