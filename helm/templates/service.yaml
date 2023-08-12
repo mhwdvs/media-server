@@ -7,38 +7,7 @@ spec:
   selector:
     app: {{ .Values.name }}
   ports:
-    - name: "bazarr"
-      protocol: TCP
-      port:  {{ .Values.service.bazarr.port }}
-      targetPort: {{ .Values.service.bazarr.port }}
-      nodePort: {{ .Values.service.bazarr.port }}
-    - name: "jackett"
-      protocol: TCP
-      port:  {{ .Values.service.jackett.port }}
-      targetPort: {{ .Values.service.jackett.port }}
-      nodePort: {{ .Values.service.jackett.port }}
     - name: "jellyfin"
       protocol: TCP
-      port: {{ .Values.service.jellyfin.port }}
+      port: 8096
       targetPort: {{ .Values.service.jellyfin.port }}
-      nodePort: {{ .Values.service.jellyfin.port }}
-    - name: "qbittorrent"
-      protocol: TCP
-      port: {{ .Values.service.qbittorrent.port }}
-      targetPort: {{ .Values.service.qbittorrent.port }}
-      nodePort: {{ .Values.service.qbittorrent.port }}
-    - name: "radarr"
-      protocol: TCP
-      port: {{ .Values.service.radarr.port }}
-      targetPort: {{ .Values.service.radarr.port }}
-      nodePort: {{ .Values.service.radarr.port }}
-    - name: "requestrr"
-      protocol: TCP
-      port: {{ .Values.service.requestrr.port }}
-      targetPort: {{ .Values.service.requestrr.port }}
-      nodePort: {{ .Values.service.requestrr.port }}
-    - name: "sonarr"
-      protocol: TCP
-      port: {{ .Values.service.sonarr.port }}
-      targetPort: {{ .Values.service.sonarr.port }}
-      nodePort: {{ .Values.service.sonarr.port }}
