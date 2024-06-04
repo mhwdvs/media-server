@@ -2,6 +2,24 @@ version: "3"
 services:
   # compose file documentation: https://docs.docker.com/compose/compose-file/
 
+  nettools:
+    image: travelping/nettools
+    networks:
+      - frontend
+    entrypoint: tail -f /dev/null
+
+  # <<<<<< Frontend >>>>>>
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/config
+      - TS_EXTRA_ARGS=--advertise-exit-node
+    volumes:
+      - ${STORAGE_PATH}/config/tailscale:/config
+    network_mode: service:gluetun-frontend
+
   jellyfin:
     image: linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -14,11 +32,6 @@ services:
     volumes:
       - ${STORAGE_PATH}/config/jellyfin:/config
       - ${STORAGE_PATH}:/data
-    ports:
-      - ${JELLYFIN_PORT}:8096
-      #- 8920:8920 #optional
-      #- 7359:7359/udp #optional
-      #- 1900:1900/udp #optional
     restart: unless-stopped
     deploy:
       resources:
@@ -27,21 +40,28 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    network_mode: service:gluetun-frontend
 
-  jackett:
-    image: linuxserver/jackett:latest
-    container_name: jackett
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      #- RUN_OPTS=<run options here> #optional
+        - LOG_LEVEL=debug
+        - TZ=${TZ}
     volumes:
-      - ${STORAGE_PATH}/config/jackett:/config
-      - ${STORAGE_PATH}/downloads:/downloads
-    network_mode: "service:gluetun"
+        - ${STORAGE_PATH}/config/jellyseerr:/app/config
     restart: unless-stopped
+    network_mode: service:gluetun-frontend
 
+  requestrr:
+      image: darkalfx/requestrr
+      container_name: requestrr
+      volumes:
+        - ${STORAGE_PATH}/config/requestrr:/root/config
+      network_mode: "service:gluetun-frontend"
+      restart: unless-stopped
+
+  # <<<<<< Middleware >>>>>>
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
@@ -52,7 +72,7 @@ services:
     volumes:
       - ${STORAGE_PATH}/config/sonarr:/config
       - ${STORAGE_PATH}:/data
-    network_mode: "service:gluetun"
+    network_mode: "service:gluetun-middleware"
     restart: unless-stopped
 
   radarr:
@@ -65,7 +85,35 @@ services:
     volumes:
       - ${STORAGE_PATH}/config/radarr:/config
       - ${STORAGE_PATH}:/data
-    network_mode: "service:gluetun"
+    network_mode: "service:gluetun-middleware"
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${STORAGE_PATH}/config/bazarr:/config
+      - ${STORAGE_PATH}:/data
+    network_mode: "service:gluetun-middleware"
+    restart: unless-stopped
+
+  # <<<<<< Backend >>>>>>
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      #- RUN_OPTS=<run options here> #optional
+    volumes:
+      - ${STORAGE_PATH}/config/jackett:/config
+      - ${STORAGE_PATH}/downloads:/downloads
+    network_mode: "service:gluetun-backend"
     restart: unless-stopped
 
   qbittorrent:
@@ -79,81 +127,114 @@ services:
     volumes:
       - ${STORAGE_PATH}/config/qbittorrent:/config
       - ${STORAGE_PATH}/downloads:/downloads
-    network_mode: "service:gluetun"
+    network_mode: "service:gluetun-backend"
     restart: unless-stopped
 
-  bazarr:
-      image: linuxserver/bazarr:latest
-      container_name: bazarr
-      environment:
-        - PUID=${PUID}
-        - PGID=${PGID}
-        - TZ=${TZ}
-      volumes:
-        - ${STORAGE_PATH}/config/bazarr:/config
-        - ${STORAGE_PATH}:/data
-      network_mode: "service:gluetun"
-      restart: unless-stopped
-
-  requestrr:
-    image: darkalfx/requestrr
-    container_name: requestrr
-    volumes:
-      - ${STORAGE_PATH}/config/requestrr:/root/config
-    network_mode: "service:gluetun"
-    restart: unless-stopped
-
-  jellyseerr:
-       image: fallenbagel/jellyseerr:latest
-       container_name: jellyseerr
-       environment:
-            - LOG_LEVEL=debug
-            - TZ=${TZ}
-       ports:
-            - ${JELLYSEERR_PORT}:5055
-       volumes:
-            - ${STORAGE_PATH}/config/jellyseerr:/app/config
-       restart: unless-stopped
-
-  gluetun:
+  # <<<<<< Gluetun >>>>>>
+  gluetun-frontend:
     image: qmcgaw/gluetun:latest
-    container_name: gluetun
+    container_name: gluetun-frontend
+    hostname: gluetun-frontend
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8888:8888/tcp # HTTP proxy
-      - 8388:8388/tcp # Shadowsocks
-      - 8388:8388/udp # Shadowsocks
-      # services available via localhost
-      - ${JACKETT_PORT}:9117
-      - ${SONARR_PORT}:8989
-      - ${RADARR_PORT}:7878
-      - ${QBITTORRENT_PORT}:6881
-      - ${QBITTORRENT_PORT}:6881/udp
-      - ${BAZARR_PORT}:6767
+      - ${JELLYFIN_PORT}:8096
+      - ${JELLYSEERR_PORT}:5055
       - ${REQUESTRR_PORT}:4545
     volumes:
-      - ${STORAGE_PATH}/config/gluetun:/gluetun
+      - ${STORAGE_PATH}/config/gluetun-frontend:/gluetun
     environment:
-      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
-      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      - VPN_SERVICE_PROVIDER=${FRONTEND_VPN_SERVICE_PROVIDER}
+      - SERVER_COUNTRIES=${FRONTEND_SERVER_COUNTRIES}
       # OpenVPN:
       #- VPN_TYPE=openvpn
       #- OPENVPN_USER=${OPENVPN_USER}
       #- OPENVPN_PASSWORD=
       # Wireguard:
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - WIREGUARD_PRIVATE_KEY=${FRONTEND_WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${FRONTEND_WIREGUARD_ADDRESSES}
       # Timezone for accurate log times
       - TZ=${TZ}
+      - FIREWALL_DEBUG=on
+    networks:
+      frontend:
+        ipv4_address: ${FRONTEND_IPV4}
 
-  # watchtower documentation: https://containrrr.dev/watchtower/
-  watchtower: # keeps container images up to date
-    image: containrrr/watchtower
+  gluetun-middleware:
+      image: qmcgaw/gluetun:latest
+      container_name: gluetun-middleware
+      hostname: gluetun-middleware
+      cap_add:
+        - NET_ADMIN
+      devices:
+        - /dev/net/tun:/dev/net/tun
+      ports:
+        - ${SONARR_PORT}:8989
+        - ${RADARR_PORT}:7878
+        - ${BAZARR_PORT}:6767
+      volumes:
+        - ${STORAGE_PATH}/config/gluetun-middleware:/gluetun
+      environment:
+        - VPN_SERVICE_PROVIDER=${MIDDLEWARE_VPN_SERVICE_PROVIDER}
+        - SERVER_COUNTRIES=${MIDDLEWARE_SERVER_COUNTRIES}
+        # OpenVPN:
+        #- VPN_TYPE=openvpn
+        #- OPENVPN_USER=${OPENVPN_USER}
+        #- OPENVPN_PASSWORD=
+        # Wireguard:
+        - VPN_TYPE=wireguard
+        - WIREGUARD_PRIVATE_KEY=${MIDDLEWARE_WIREGUARD_PRIVATE_KEY}
+        - WIREGUARD_ADDRESSES=${MIDDLEWARE_WIREGUARD_ADDRESSES}
+        # Timezone for accurate log times
+        - TZ=${TZ}
+        - FIREWALL_DEBUG=on
+      networks:
+        frontend:
+          ipv4_address: ${MIDDLEWARE_FRONTEND_IPV4}
+        backend:
+          ipv4_address: ${MIDDLEWARE_BACKEND_IPV4}
+
+  gluetun-backend:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun-backend
+    hostname: gluetun-backend
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - ${JACKETT_PORT}:9117
+      - ${QBITTORRENT_PORT}:6881
+      - ${QBITTORRENT_PORT}:6881/udp
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${STORAGE_PATH}/config/gluetun-backend:/gluetun
     environment:
-      - WATCHTOWER_POLL_INTERVAL=604800 # check every 7 days
+      - VPN_SERVICE_PROVIDER=${BACKEND_VPN_SERVICE_PROVIDER}
+      - SERVER_COUNTRIES=${BACKEND_SERVER_COUNTRIES}
+      # OpenVPN:
+      #- VPN_TYPE=openvpn
+      #- OPENVPN_USER=${OPENVPN_USER}
+      #- OPENVPN_PASSWORD=
+      # Wireguard:
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${BACKEND_WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${BACKEND_WIREGUARD_ADDRESSES}
+      # Timezone for accurate log times
+      - TZ=${TZ}
+      - FIREWALL_DEBUG=on
+    networks:
+      backend:
+        ipv4_address: ${BACKEND_IPV4}
+
+networks:
+  frontend:
+    ipam:
+      config:
+        - subnet: ${FRONTEND_SUBNET}
+  backend:
+    ipam:
+      config:
+        - subnet: ${BACKEND_SUBNET}

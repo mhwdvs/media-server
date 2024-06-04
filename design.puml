@@ -1,56 +1,57 @@
 @startuml Media Server High-Level Architecture Overview
 title Media Server High-Level Architecture Overview
 
-package Docker{
-    [Jellyfish]
+package Frontend{
+    [Jellyfin]
     [Jellyseerr]
-    [Jackett]
-    [Sonarr]
-    [Radarr]
-    [Qbittorrent]
     [Requestrr]
-    () Gluetun
+    () GluetunFrontend 
+    () Tailscale
 }
 
-Jackett <..> Sonarr
-Jackett <..> Radarr
+package Middleware{
+    [Sonarr]
+    [Radarr]
+    [Bazarr]
+    () GluetunMiddleware
+}
 
-Sonarr <..> Qbittorrent
-Radarr <..> Qbittorrent
+package Backend{
+    [Jackett]
+    [Qbittorrent]
+    () GluetunBackend
+}
 
-Requestrr <..> Sonarr
-Requestrr <..> Radarr
+Jackett <.[#red]. Sonarr
+Jackett <.[#red]. Radarr
+Qbittorrent <.[#red]. Sonarr
+Qbittorrent <.[#red]. Radarr
+Jackett <--> GluetunBackend
+Qbittorrent <--> GluetunBackend
 
-Jackett <--> Gluetun
-Sonarr <--> Gluetun
-Radarr <--> Gluetun
-Qbittorrent <--> Gluetun
-Requestrr <--> Gluetun
+Bazarr --> Sonarr
+Bazarr --> Radarr
 
-note top of Requestrr
-    doesn't have to be in Gluetun,
-    but simplifies Docker networking
-end note
+Bazarr <--> GluetunMiddleware
+Sonarr <--> GluetunMiddleware
+Radarr <--> GluetunMiddleware
 
-Jellyseerr <..> Jellyfish
-Jellyseerr <..> Sonarr
-Jellyseerr <..> Radarr
+Jellyseerr ..> Jellyfin
+Jellyseerr .[#green].> Sonarr
+Jellyseerr .[#green].> Radarr
+Requestrr .[#green].> Sonarr
+Requestrr .[#green].> Radarr
 
-Jellyseerr <--> LAN
-Jellyfish <--> LAN
-Gluetun <--> LAN
+Requestrr <--> GluetunFrontend
+Jellyseerr <--> GluetunFrontend
+Jellyfin <--> GluetunFrontend
 
-note left of Gluetun
-    All services networked via Gluetun can access each other,
-    and are exposed on the local network. All of these services 
-    are also tunneled through the configured VPN service
-end note
+Tailscale --> Jellyfin
+Tailscale --> Jellyseerr
+GluetunFrontend <--> Tailscale
 
-LAN <..> Tailscale
-LAN <--> Internet
-
-note right of Tailscale
-    Optional, saves port-forwarding or cloud hosting
-end note
+GluetunBackend <-[#blue]-> Internet: tunneled
+GluetunMiddleware <-[#blue]-> Internet: tunneled
+GluetunFrontend <-[#blue]-> Internet: tunneled
 
 @enduml
