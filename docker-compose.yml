@@ -9,15 +9,15 @@ services:
     entrypoint: tail -f /dev/null
 
   # <<<<<< Frontend >>>>>>
-  tailscale:
+  tailscale-frontend:
     image: tailscale/tailscale:latest
-    container_name: tailscale
+    container_name: tailscale-frontend
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATE_DIR=/config
       - TS_EXTRA_ARGS=--advertise-exit-node
     volumes:
-      - ${STORAGE_PATH}/config/tailscale:/config
+      - ${STORAGE_PATH}/config/tailscale-frontend:/config
     network_mode: service:gluetun-frontend
 
   jellyfin:
@@ -101,6 +101,16 @@ services:
     network_mode: "service:gluetun-middleware"
     restart: unless-stopped
 
+  tailscale-middleware:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-middleware
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/config
+    volumes:
+      - ${STORAGE_PATH}/config/tailscale-middleware:/config
+    network_mode: service:gluetun-middleware
+
   # <<<<<< Backend >>>>>>
   jackett:
     image: linuxserver/jackett:latest
@@ -129,6 +139,16 @@ services:
       - ${STORAGE_PATH}/downloads:/downloads
     network_mode: "service:gluetun-backend"
     restart: unless-stopped
+
+  tailscale-backend:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-backend
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/config
+    volumes:
+      - ${STORAGE_PATH}/config/tailscale-backend:/config
+    network_mode: service:gluetun-backend
 
   # <<<<<< Gluetun >>>>>>
   gluetun-frontend:
