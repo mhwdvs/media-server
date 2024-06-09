@@ -207,8 +207,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     ports:
       - ${JACKETT_PORT}:9117
-      - ${QBITTORRENT_PORT}:6881
-      - ${QBITTORRENT_PORT}:6881/udp
+      - ${QBITTORRENT_PORT}:${QBITTORRENT_PORT}
     volumes:
       - ${STORAGE_PATH}/config/gluetun-backend:/gluetun
     environment:
