@@ -1,6 +1,4 @@
 services:
-  # compose file documentation: https://docs.docker.com/compose/compose-file/
-
   # <<<<<< Frontend >>>>>>
   tailscale-frontend:
     image: tailscale/tailscale:latest
@@ -38,7 +36,7 @@ services:
     network_mode: service:gluetun-frontend
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:1.9.2
     container_name: jellyseerr
     environment:
         - LOG_LEVEL=debug
