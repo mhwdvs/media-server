@@ -26,13 +26,15 @@ services:
       - ${STORAGE_PATH}/config/jellyfin:/config
       - ${STORAGE_PATH}:/data
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    #devices:
+    #  - /dev/dri:/dev/dri
+    #deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - driver: nvidia
+    #          count: 1
+    #          capabilities: [gpu]
     network_mode: service:gluetun-frontend
 
   jellyseerr:
