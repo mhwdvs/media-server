@@ -1,12 +1,5 @@
-version: "3"
 services:
   # compose file documentation: https://docs.docker.com/compose/compose-file/
-
-  nettools:
-    image: travelping/nettools
-    networks:
-      - frontend
-    entrypoint: tail -f /dev/null
 
   # <<<<<< Frontend >>>>>>
   tailscale-frontend:
