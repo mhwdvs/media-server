@@ -241,6 +241,18 @@ services:
       backend:
         ipv4_address: ${BACKEND_IPV4}
 
+  # <<<<<< Observability >>>>>>
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - 3000:3000
+
 networks:
   frontend:
     ipam:
