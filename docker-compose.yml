@@ -47,7 +47,7 @@ services:
     network_mode: service:gluetun-frontend
 
   requestrr:
-      image: darkalfx/requestrr
+      image: thomst08/requestrr:v2.1.6
       container_name: requestrr
       volumes:
         - ${STORAGE_PATH}/config/requestrr:/root/config
