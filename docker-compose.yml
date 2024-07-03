@@ -18,7 +18,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - NVIDIA_VISIBLE_DEVICES=all # allow for gpu encoding
+      #- NVIDIA_VISIBLE_DEVICES=all # allow for gpu encoding
       #- JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
     volumes:
       - ${STORAGE_PATH}/config/jellyfin:/config
