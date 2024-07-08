@@ -154,6 +154,8 @@ services:
       - /dev/net/tun:/dev/net/tun
     ports:
       - ${JELLYFIN_PORT}:8096
+      - 7359:7359/udp # jellyfin service discovery
+      - 1900:1900/udp # jellyfin dlna discovery
       - ${JELLYSEERR_PORT}:5055
       - ${REQUESTRR_PORT}:4545
     volumes:
