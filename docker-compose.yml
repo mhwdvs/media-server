@@ -24,8 +24,8 @@ services:
       - ${STORAGE_PATH}/config/jellyfin:/config
       - ${STORAGE_PATH}:/data
     restart: unless-stopped
-    #devices:
-    #  - /dev/dri:/dev/dri
+    devices:
+      - /dev/dri:/dev/dri
     #deploy:
     #  resources:
     #    reservations:
